@@ -13,7 +13,11 @@ from app.config import config
 
 logger = logging.getLogger(__name__)
 
-_client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+_client = anthropic.Anthropic(
+    api_key=config.ANTHROPIC_API_KEY,
+    base_url="https://openrouter.ai/api",
+    default_headers={"HTTP-Referer": "https://github.com/hebatea/hypatia"},
+)
 
 FALLBACK_REFLECTION = (
     "Thank you for showing up today. That matters more than you know. "

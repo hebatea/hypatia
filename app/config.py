@@ -17,7 +17,7 @@ class Config:
     SCHEDULER_INTERVAL_MINUTES: int = 5
 
     # LLM
-    LLM_MODEL: str = "claude-haiku-4-5-20251001"
+    LLM_MODEL: str = "anthropic/claude-3.5-haiku"
     LLM_MAX_TOKENS: int = 300
 
     # Timezones shown in onboarding buttons

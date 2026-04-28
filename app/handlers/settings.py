@@ -57,6 +57,7 @@ async def cmd_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             f"📅 *{date_str}*\n"
             f"  Challenge: {c.challenge[:60]}{'…' if len(c.challenge) > 60 else ''}\n"
             f"  Grateful: {c.gratitude[:60]}{'…' if len(c.gratitude) > 60 else ''}\n"
+            f"  Intention: {c.intention[:60]}{'…' if len(c.intention) > 60 else ''}\n"
         )
 
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
@@ -128,6 +129,8 @@ async def callback_nav(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             lines.append(
                 f"📅 *{date_str}*\n"
                 f"  Challenge: {c.challenge[:60]}{'…' if len(c.challenge) > 60 else ''}\n"
+                f"  Grateful: {c.gratitude[:60]}{'…' if len(c.gratitude) > 60 else ''}\n"
+                f"  Intention: {c.intention[:60]}{'…' if len(c.intention) > 60 else ''}\n"
             )
         await query.edit_message_text("\n".join(lines), parse_mode="Markdown")
 
