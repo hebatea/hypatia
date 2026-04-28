@@ -11,9 +11,6 @@ from app.db.models import Base
 engine = create_async_engine(
     config.DATABASE_URL,
     echo=False,
-    pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=10,
 )
 
 AsyncSessionFactory = async_sessionmaker(
