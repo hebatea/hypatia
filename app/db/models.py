@@ -6,6 +6,7 @@ from datetime import datetime, date
 from sqlalchemy import (
     BigInteger, Boolean, Column, Date, DateTime,
     Integer, String, Text, Time, func,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import DeclarativeBase
 
@@ -72,3 +73,14 @@ class ReminderLog(Base):
     message_sent = Column(Text, nullable=True)   # The actual text that was sent
     status = Column(String(16), default="sent")  # sent | failed | skipped
     sent_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+
+class MagicLink(Base):
+    __tablename__ = "magic_links"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(BigInteger, nullable=False, index=True)
+    token = Column(String(64), nullable=False, unique=True)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False, nullable=False)
