@@ -196,7 +196,7 @@ async def log_reminder(
 async def create_magic_link(session: AsyncSession, user_id: int) -> str:
     """Creates a new magic link token valid for 24 hours. Returns the token."""
     token = secrets.token_urlsafe(32)
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     link = MagicLink(
         user_id=user_id,
         token=token,
