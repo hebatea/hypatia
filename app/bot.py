@@ -16,6 +16,7 @@ from app.handlers.checkin import (
     callback_checkin_flow,
     cmd_checkin,
     handle_checkin_message,
+    handle_voice_message,
 )
 from app.handlers.onboarding import (
     callback_reminder_time,
@@ -59,6 +60,11 @@ def create_bot() -> Application:
     # ── Free text messages (state machine routes them) ────────────────────
     app.add_handler(
         MessageHandler(filters.TEXT & ~filters.COMMAND, handle_checkin_message)
+    )
+
+    # ── Voice messages (transcribed then routed through check-in flow) ────
+    app.add_handler(
+        MessageHandler(filters.VOICE, handle_voice_message)
     )
 
     return app
