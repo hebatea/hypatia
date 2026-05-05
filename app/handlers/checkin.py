@@ -206,3 +206,98 @@ def _streak_message(streak: int) -> str:
     if streak in milestones:
         return milestones[streak]
     return f"🔥 *{streak} day streak*"
+
+
+async def handle_voice_message(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """
+    Handles voice messages during check-in states.
+    Transcribes audio via Groq Whisper then routes the text
+    through the same check-in flow as handle_checkin_message.
+    """
+    from app.services.transcription import transcribe_voice
+
+    user_id = update.effective_user.id
+
+    async with get_session() as session:
+        user = await repo.get_user(session, user_id)
+        if not user or user.state not in (IN_CHECKIN_1, IN_CHECKIN_2, IN_CHECKIN_3):
+            return
+
+    # Download voice file
+    voice = update.message.voice
+    tg_file = await context.bot.get_file(voice.file_id)
+    file_bytes = bytes(await tg_file.download_as_bytearray())
+
+    text = await transcribe_voice(file_bytes)
+    if not text:
+        await update.message.reply_text(
+            "Sorry, I couldn't catch that 🎙️ Could you type your answer instead?"
+        )
+        return
+
+    await update.message.reply_text(f"Got it 🎙️ I heard: _{text}_", parse_mode="Markdown")
+
+    # Route transcribed text through the same check-in logic
+    async with get_session() as session:
+        user = await repo.get_user(session, user_id)
+        if not user:
+            return
+
+        state = user.state
+
+        if state == IN_CHECKIN_1:
+            await repo.update_user_temp(session, user_id, challenge=text)
+            await repo.update_user_state(session, user_id, IN_CHECKIN_2, current_step=2)
+            await update.message.reply_text(f"Got it ✓\n\n*{Q2}*", parse_mode="Markdown")
+
+        elif state == IN_CHECKIN_2:
+            await repo.update_user_temp(session, user_id, gratitude=text)
+            await repo.update_user_state(session, user_id, IN_CHECKIN_3, current_step=3)
+            await update.message.reply_text(f"Beautiful ✓\n\n*{Q3}*", parse_mode="Markdown")
+
+        elif state == IN_CHECKIN_3:
+            await repo.update_user_state(session, user_id, AWAITING_LLM)
+
+            challenge = user.temp_challenge or ""
+            gratitude = user.temp_gratitude or ""
+            intention = text
+            first_name = user.first_name or "friend"
+
+            today = _today_for_user(user.timezone)
+            streak = await repo.update_streak(session, user_id, today)
+
+        else:
+            return
+
+    if state == IN_CHECKIN_3:
+        await update.message.reply_text("Saving your check-in… ✨")
+
+        answers = CheckinAnswers(
+            challenge=challenge,
+            gratitude=gratitude,
+            intention=intention,
+            streak=streak,
+            first_name=first_name,
+        )
+        reflection = await generate_reflection(answers)
+
+        async with get_session() as session:
+            await repo.save_checkin(
+                session,
+                user_id=user_id,
+                challenge=challenge,
+                gratitude=gratitude,
+                intention=intention,
+                llm_response=reflection,
+                streak=streak,
+            )
+            await repo.update_user_state(session, user_id, IDLE)
+            await repo.update_user_temp(session, user_id, challenge=None, gratitude=None)
+
+        streak_line = _streak_message(streak)
+        await update.message.reply_text(
+            f"{reflection}\n\n{streak_line}",
+            parse_mode="Markdown",
+        )

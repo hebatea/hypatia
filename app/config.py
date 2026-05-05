@@ -11,6 +11,7 @@ load_dotenv()
 class Config:
     BOT_TOKEN: str = os.environ.get("BOT_TOKEN", "")
     ANTHROPIC_API_KEY: str = os.environ.get("ANTHROPIC_API_KEY", "")
+    GROQ_API_KEY: str = os.environ.get("GROQ_API_KEY", "")
     DATABASE_URL: str = os.environ["DATABASE_URL"]
     WEB_BASE_URL: str = os.environ.get("WEB_BASE_URL", "https://hypatia-web.vercel.app")
 
