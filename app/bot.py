@@ -25,6 +25,7 @@ from app.handlers.onboarding import (
 from app.handlers.settings import (
     callback_nav,
     cmd_history,
+    cmd_myhistory,
     cmd_pause,
     cmd_remind,
     cmd_resume,
@@ -44,6 +45,7 @@ def create_bot() -> Application:
     app.add_handler(CommandHandler("checkin", cmd_checkin))
     app.add_handler(CommandHandler("streak", cmd_streak))
     app.add_handler(CommandHandler("history", cmd_history))
+    app.add_handler(CommandHandler("myhistory", cmd_myhistory))
     app.add_handler(CommandHandler("remind", cmd_remind))
     app.add_handler(CommandHandler("pause", cmd_pause))
     app.add_handler(CommandHandler("resume", cmd_resume))
@@ -60,3 +62,4 @@ def create_bot() -> Application:
     )
 
     return app
+

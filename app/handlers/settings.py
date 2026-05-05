@@ -11,6 +11,7 @@ import logging
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from app.config import config
 from app.db.engine import get_session
 from app.db import repository as repo
 from app.handlers.keyboards import reminder_time_keyboard, timezone_keyboard
@@ -61,6 +62,23 @@ async def cmd_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         )
 
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+
+
+async def cmd_myhistory(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Generates a magic link and sends it to the user."""
+    user_id = update.effective_user.id
+    async with get_session() as session:
+        user = await repo.get_user(session, user_id)
+        if not user:
+            await update.message.reply_text("Use /start to get set up first.")
+            return
+        token = await repo.create_magic_link(session, user_id)
+
+    url = f"{config.WEB_BASE_URL}/history?token={token}"
+    await update.message.reply_text(
+        f"Here is your history link — it expires in 24 hours:\n\n{url}",
+        disable_web_page_preview=True,
+    )
 
 
 async def cmd_remind(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

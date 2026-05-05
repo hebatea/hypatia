@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hypatia — Your History</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #0F6E56;
+      --green-light: #e8f5f1;
+      --green-mid: #d0ece5;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f9fafb;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    header .logo {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--green);
+      letter-spacing: -0.5px;
+    }
+
+    header .tagline {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      max-width: 640px;
+      margin: 0 auto 16px;
+    }
+
+    .hero {
+      background: var(--green);
+      color: white;
+      border: none;
+      text-align: center;
+      padding: 28px 20px;
+    }
+
+    .hero .name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .hero .streak-label {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .hero .streak-count {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .hero .streak-unit {
+      font-size: 0.95rem;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 10px;
+    }
+
+    .checkin-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      max-width: 640px;
+      margin: 0 auto 12px;
+    }
+
+    .checkin-date {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+
+    .field {
+      margin-bottom: 10px;
+    }
+
+    .field:last-child { margin-bottom: 0; }
+
+    .field-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 3px;
+    }
+
+    .field-value {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    /* States */
+    .state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .state .icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .state h2 {
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .state p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--green-mid);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Hypatia</div>
+    <div class="tagline">Your daily reflection history</div>
+  </header>
+
+  <div id="app">
+    <div class="state">
+      <div class="spinner"></div>
+      <p>Loading your history…</p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://hypatia-backend-production-f6fc.up.railway.app";
+
+    async function load() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+
+      if (!token) {
+        renderError(
+          "No link token found",
+          "Use /myhistory in the Hypatia bot to generate a personal history link."
+        );
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/history?token=${encodeURIComponent(token)}`);
+        if (res.status === 401) {
+          renderError(
+            "Link expired or already used",
+            "Magic links are valid for 24 hours and can only be used once. Use /myhistory in the bot to get a new one."
+          );
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        renderHistory(data);
+      } catch (err) {
+        renderError(
+          "Could not load your history",
+          "Something went wrong. Please try again or generate a new link with /myhistory."
+        );
+      }
+    }
+
+    function renderHistory(data) {
+      const app = document.getElementById("app");
+
+      const checkinCards = data.checkins.map(c => `
+        <div class="checkin-card">
+          <div class="checkin-date">${c.date}</div>
+          <div class="field">
+            <div class="field-label">Challenge</div>
+            <div class="field-value">${escHtml(c.challenge)}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Gratitude</div>
+            <div class="field-value">${escHtml(c.gratitude)}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Intention</div>
+            <div class="field-value">${escHtml(c.intention)}</div>
+          </div>
+        </div>
+      `).join("");
+
+      const empty = data.checkins.length === 0
+        ? `<div class="state"><div class="icon">📝</div><h2>No check-ins yet</h2><p>Start your first one with /checkin in the bot.</p></div>`
+        : "";
+
+      app.innerHTML = `
+        <div class="card hero">
+          <div class="name">Hey, ${escHtml(data.first_name)} 👋</div>
+          <div class="streak-label">Current streak</div>
+          <div class="streak-count">${data.streak}</div>
+          <div class="streak-unit">day${data.streak === 1 ? "" : "s"}</div>
+        </div>
+
+        ${data.checkins.length > 0 ? `<div class="section-title">Last ${data.checkins.length} check-in${data.checkins.length === 1 ? "" : "s"}</div>` : ""}
+        ${checkinCards}
+        ${empty}
+      `;
+    }
+
+    function renderError(title, message) {
+      document.getElementById("app").innerHTML = `
+        <div class="state">
+          <div class="icon">🔒</div>
+          <h2>${escHtml(title)}</h2>
+          <p>${escHtml(message)}</p>
+        </div>
+      `;
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    load();
+  </script>
+
+</body>
+</html>

@@ -67,6 +67,7 @@ Their answers:
 Write their reflection now."""
 
     try:
+        logger.info(f"Calling LLM for reflection — model={config.LLM_MODEL}")
         response = _client.messages.create(
             model=config.LLM_MODEL,
             max_tokens=config.LLM_MAX_TOKENS,
@@ -74,9 +75,10 @@ Write their reflection now."""
             messages=[{"role": "user", "content": user_message}],
         )
         text = response.content[0].text.strip()
+        logger.info("LLM reflection succeeded")
         return text
     except Exception as e:
-        logger.error(f"LLM reflection failed: {e}")
+        logger.error(f"LLM reflection failed: {e}", exc_info=True)
         return FALLBACK_REFLECTION
 
 

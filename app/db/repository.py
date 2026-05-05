@@ -2,13 +2,14 @@
 Repository layer — all database queries live here.
 Handlers and services never write raw SQL; they call these functions.
 """
-from datetime import date, time
+import secrets
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Optional
 
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Checkin, ReminderLog, User
+from app.db.models import Checkin, MagicLink, ReminderLog, User
 
 
 # ─── USER ──────────────────────────────────────────────────────────────────
@@ -187,3 +188,49 @@ async def log_reminder(
 ) -> None:
     entry = ReminderLog(user_id=user_id, message_sent=message, status=status)
     session.add(entry)
+
+
+# ─── MAGIC LINKS ───────────────────────────────────────────────────────────
+
+
+async def create_magic_link(session: AsyncSession, user_id: int) -> str:
+    """Creates a new magic link token valid for 24 hours. Returns the token."""
+    token = secrets.token_urlsafe(32)
+    now = datetime.utcnow()
+    link = MagicLink(
+        user_id=user_id,
+        token=token,
+        created_at=now,
+        expires_at=now + timedelta(hours=24),
+        used=False,
+    )
+    session.add(link)
+    await session.flush()
+    return token
+
+
+async def validate_token(session: AsyncSession, token: str) -> Optional[int]:
+    """
+    Returns the user_id if the token is valid, unexpired, and unused.
+    Marks it as used on success.
+    """
+    result = await session.execute(
+        select(MagicLink).where(MagicLink.token == token)
+    )
+    link = result.scalar_one_or_none()
+
+    if not link:
+        return None
+    if link.used:
+        return None
+
+    now = datetime.now(timezone.utc)
+    expires = link.expires_at
+    # Handle naive datetimes stored by SQLite (no tzinfo)
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if now > expires:
+        return None
+
+    link.used = True
+    return link.user_id
