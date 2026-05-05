@@ -5,10 +5,10 @@ Tables are created automatically on startup via create_all().
 from datetime import datetime, date
 from sqlalchemy import (
     BigInteger, Boolean, Column, Date, DateTime,
-    Integer, String, Text, Time, func,
+    ForeignKey, Integer, String, Text, Time, func,
     UniqueConstraint,
 )
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, relationship
 
 
 class Base(DeclarativeBase):
@@ -46,12 +46,16 @@ class User(Base):
     updated_at = Column(DateTime, server_default=func.now(),
                         onupdate=func.now(), nullable=False)
 
+    checkins = relationship("Checkin", back_populates="user", cascade="all, delete-orphan")
+    reminder_logs = relationship("ReminderLog", back_populates="user", cascade="all, delete-orphan")
+    magic_links = relationship("MagicLink", back_populates="user", cascade="all, delete-orphan")
+
 
 class Checkin(Base):
     __tablename__ = "checkins"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(BigInteger, nullable=False, index=True)
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     challenge = Column(Text, nullable=False)
     gratitude = Column(Text, nullable=False)
@@ -63,24 +67,30 @@ class Checkin(Base):
     streak_at_time = Column(Integer, nullable=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
+    user = relationship("User", back_populates="checkins")
+
 
 class ReminderLog(Base):
     __tablename__ = "reminder_log"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(BigInteger, nullable=False, index=True)
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     message_sent = Column(Text, nullable=True)   # The actual text that was sent
     status = Column(String(16), default="sent")  # sent | failed | skipped
     sent_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+    user = relationship("User", back_populates="reminder_logs")
 
 
 class MagicLink(Base):
     __tablename__ = "magic_links"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(BigInteger, nullable=False, index=True)
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     token = Column(String(64), nullable=False, unique=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     expires_at = Column(DateTime, nullable=False)
     used = Column(Boolean, default=False, nullable=False)
+
+    user = relationship("User", back_populates="magic_links")
