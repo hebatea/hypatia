@@ -4,447 +4,304 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hypatia — My History</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --teal: #0F6E56;
-      --teal-light: #E1F5EE;
-      --bg: #F7FAF9;
-      --text: #1A2E2A;
-      --gray: #64748B;
-      --border: #E2E8F0;
+      --teal: #0F6E56; --teal-light: #E1F5EE; --teal-dark: #0A4D3C;
+      --bg: #F7FAF9; --surface: #FFFFFF; --text: #1A2E2A;
+      --text-secondary: #64748B; --border: #E2E8F0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06); --radius: 10px;
+      --font: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
     }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; }
+    .hidden { display: none !important; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+    /* Header */
+    .header { background: var(--teal); color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 500; }
 
-    /* ── Header ─────────────────────────────────────────────── */
-    .header {
-      background: var(--teal);
-      color: white;
-      padding: 28px 20px 24px;
-      text-align: center;
-    }
-    .header-name {
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .header-streak {
-      font-size: 1rem;
-      opacity: 0.9;
-    }
+    /* Tab bar */
+    .tab-bar { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+    .tab { flex: 1; padding: 12px 0; text-align: center; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; user-select: none; transition: color .15s, border-color .15s; }
+    .tab.active { color: var(--teal); border-bottom-color: var(--teal); }
 
-    /* ── Tab bar ─────────────────────────────────────────────── */
-    .tab-bar {
-      display: flex;
-      background: white;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .tab-bar::-webkit-scrollbar { display: none; }
-
-    .tab {
-      flex: 1;
-      min-width: 80px;
-      padding: 14px 8px 12px;
-      text-align: center;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: var(--gray);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      white-space: nowrap;
-      user-select: none;
-      transition: color 0.15s, border-color 0.15s;
-    }
-    .tab.active {
-      color: var(--teal);
-      border-bottom-color: var(--teal);
-    }
-
-    /* ── Panels ──────────────────────────────────────────────── */
-    .panel { display: none; padding: 20px 16px 48px; }
+    /* Panels */
+    .panel { display: none; padding: 16px 20px 48px; }
     .panel.active { display: block; }
+    .panel-inner { max-width: 720px; margin: 0 auto; }
 
-    /* ── Check-ins table ─────────────────────────────────────── */
-    .table-wrap {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 520px;
-      font-size: 0.87rem;
-    }
-    thead tr {
-      background: var(--teal);
-      color: white;
-    }
-    thead th {
-      padding: 11px 14px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.8rem;
-      letter-spacing: 0.03em;
-    }
-    tbody tr {
-      cursor: pointer;
-      transition: background 0.1s;
-    }
-    tbody tr:nth-child(odd)  { background: white; }
+    /* Mobile check-in cards */
+    .checkins-desktop { display: none; }
+    .ci-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 14px; margin-bottom: 10px; cursor: pointer; }
+    .ci-card-date { font-size: 12px; font-weight: 500; color: var(--teal); margin-bottom: 8px; }
+    .ci-row { display: flex; gap: 8px; align-items: baseline; margin-bottom: 4px; }
+    .ci-row:last-child { margin-bottom: 0; }
+    .ci-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .06em; min-width: 72px; flex-shrink: 0; }
+    .ci-value { font-size: 14px; color: var(--text); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1; min-width: 0; }
+    .ci-card.expanded .ci-value { white-space: normal; overflow: visible; text-overflow: unset; }
+
+    /* Desktop table */
+    @media (min-width: 640px) { .checkins-mobile { display: none; } .checkins-desktop { display: block; } }
+    .table-wrap { border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: var(--teal); color: white; }
+    thead th { padding: 10px 14px; text-align: left; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+    th.col-date { width: 120px; }
+    tbody tr { cursor: pointer; border-bottom: 1px solid var(--border); }
+    tbody tr:nth-child(odd)  { background: var(--surface); }
     tbody tr:nth-child(even) { background: var(--bg); }
-    tbody tr:hover { background: var(--teal-light); }
-    tbody td {
-      padding: 11px 14px;
-      vertical-align: top;
-      border-top: 1px solid var(--border);
-      line-height: 1.45;
-    }
-    td.date-cell {
-      white-space: nowrap;
-      color: var(--gray);
-      font-size: 0.8rem;
-    }
-    .expanded-row td {
-      background: var(--teal-light) !important;
-      white-space: normal;
-    }
-    .no-data {
-      text-align: center;
-      color: var(--gray);
-      padding: 48px 20px;
-      font-size: 0.95rem;
-    }
+    tbody td { padding: 10px 14px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 0; }
+    td.col-date { white-space: nowrap; color: var(--text-secondary); }
+    .detail-tr td { background: var(--teal-light); white-space: normal; padding: 12px 14px; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--teal); margin-bottom: 4px; }
+    .detail-value { font-size: 13px; color: var(--text); line-height: 1.5; }
 
-    /* ── Step cards ──────────────────────────────────────────── */
-    .step-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    .step-card-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--gray);
-      margin-bottom: 6px;
-    }
-    .step-card-question {
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 10px;
-      line-height: 1.5;
-    }
-    .step-card-answer-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--teal);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 4px;
-    }
-    .step-card-answer {
-      font-size: 0.9rem;
-      line-height: 1.6;
-      color: var(--text);
-    }
+    /* Empty / coming-soon states */
+    .empty-state { text-align: center; padding: 48px 20px; }
+    .es-icon { font-size: 32px; }
+    .empty-state h3 { font-size: 16px; font-weight: 500; color: var(--text); margin: 12px 0 6px; }
+    .empty-state p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+    .empty-state code { background: var(--teal-light); color: var(--teal); padding: 1px 5px; border-radius: 4px; }
 
-    /* ── Coming soon / empty states ──────────────────────────── */
-    .coming-soon {
-      text-align: center;
-      color: var(--gray);
-      padding: 60px 20px;
-    }
-    .coming-soon .cs-icon {
-      font-size: 2.4rem;
-      margin-bottom: 14px;
-    }
-    .coming-soon h2 {
-      font-size: 1.05rem;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-    .coming-soon p {
-      font-size: 0.88rem;
-      line-height: 1.7;
-    }
-    .coming-soon code {
-      background: var(--teal-light);
-      color: var(--teal);
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-size: 0.88rem;
-    }
+    /* Step 1 cards */
+    .step-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border-left: 3px solid var(--teal); padding: 16px; margin-bottom: 12px; }
+    .sc-q-label { font-size: 11px; font-weight: 600; color: var(--teal); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+    .sc-q-text  { font-size: 14px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+    .sc-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 10px; }
+    .sc-a-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+    .sc-a-text  { font-size: 15px; color: var(--text); line-height: 1.6; }
 
-    /* ── Full-page states ────────────────────────────────────── */
-    .full-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 40px 24px;
-      text-align: center;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #c7e8de;
-      border-top-color: var(--teal);
-      border-radius: 50%;
-      animation: spin 0.75s linear infinite;
-      margin-bottom: 18px;
-    }
+    /* Loading */
+    .full-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 24px; text-align: center; }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin .8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .full-state h2 {
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-    .full-state p {
-      font-size: 0.9rem;
-      color: var(--gray);
-      line-height: 1.7;
-      max-width: 320px;
-    }
+    .loading-text { color: var(--text-secondary); font-size: 14px; margin-top: 12px; }
+
+    /* Error */
+    .error-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px 24px; max-width: 320px; width: 100%; }
+    .error-icon    { font-size: 32px; }
+    .error-heading { font-size: 16px; font-weight: 500; color: var(--text); margin: 12px 0 6px; }
+    .error-body    { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
   </style>
 </head>
 <body>
 
   <div id="loading" class="full-state">
     <div class="spinner"></div>
-    <p>Loading your history…</p>
+    <p class="loading-text">Loading your history…</p>
   </div>
 
-  <div id="error" class="full-state" style="display:none;">
-    <div style="font-size:2.4rem;margin-bottom:14px;">🔒</div>
-    <h2>Link expired or not valid</h2>
-    <p>Open the bot and send <code>/myhistory</code> to get a fresh link.</p>
-  </div>
-
-  <div id="app" style="display:none;">
-    <div class="header">
-      <div class="header-name" id="hdr-name"></div>
-      <div class="header-streak" id="hdr-streak"></div>
+  <div id="error" class="full-state hidden">
+    <div class="error-card">
+      <div class="error-icon">🔗</div>
+      <h2 class="error-heading">Link expired</h2>
+      <p class="error-body">Open the bot and send /myhistory to get a new link.</p>
     </div>
+  </div>
 
-    <div class="tab-bar">
+  <div id="app" class="hidden">
+    <header class="header">
+      <span id="hdr-name"></span>
+      <span id="hdr-streak"></span>
+    </header>
+
+    <nav class="tab-bar">
       <div class="tab active" data-tab="checkins">Check-ins</div>
       <div class="tab"        data-tab="step1">Step 1</div>
       <div class="tab"        data-tab="step2">Step 2</div>
       <div class="tab"        data-tab="step3">Step 3</div>
-    </div>
+    </nav>
 
-    <!-- Check-ins panel -->
-    <div class="panel active" id="panel-checkins">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Challenge</th>
-              <th>Gratitude</th>
-              <th>Intention</th>
-            </tr>
-          </thead>
-          <tbody id="checkins-tbody"></tbody>
-        </table>
+    <section class="panel active" id="panel-checkins">
+      <div class="panel-inner">
+        <div class="checkins-mobile" id="checkins-mobile"></div>
+        <div class="checkins-desktop">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th class="col-date">Date</th><th>Challenge</th><th>Gratitude</th><th>Intention</th></tr></thead>
+              <tbody id="checkins-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="no-checkins" class="empty-state hidden"><p>No check-ins yet.</p></div>
       </div>
-      <div id="no-checkins" class="no-data" style="display:none;">No check-ins yet.</div>
-    </div>
+    </section>
 
-    <!-- Step 1 panel -->
-    <div class="panel" id="panel-step1">
-      <div id="step1-empty" class="coming-soon" style="display:none;">
-        <div class="cs-icon">📋</div>
-        <h2>You haven't completed Step 1 yet.</h2>
-        <p>Use <code>/step1</code> in the bot to begin.</p>
+    <section class="panel" id="panel-step1">
+      <div class="panel-inner">
+        <div id="step1-empty" class="empty-state hidden">
+          <div class="es-icon">🌱</div>
+          <h3>Step 1 not started</h3>
+          <p>Open the bot and send <code>/step1</code> to begin.</p>
+        </div>
+        <div id="step1-cards"></div>
       </div>
-      <div id="step1-cards"></div>
-    </div>
+    </section>
 
-    <!-- Step 2 panel -->
-    <div class="panel" id="panel-step2">
-      <div class="coming-soon">
-        <div class="cs-icon">🌿</div>
-        <h2>Step 2 is coming soon.</h2>
-        <p>Once you have completed Step 1, use <code>/step2</code> in the bot to continue your journey.</p>
+    <section class="panel" id="panel-step2">
+      <div class="panel-inner">
+        <div class="empty-state">
+          <div class="es-icon">🌿</div>
+          <h3>Step 2 coming soon</h3>
+          <p>Complete Step 1 first, then use <code>/step2</code>.</p>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Step 3 panel -->
-    <div class="panel" id="panel-step3">
-      <div class="coming-soon">
-        <div class="cs-icon">🌿</div>
-        <h2>Step 3 is coming soon.</h2>
-        <p>The path continues after Step 2.</p>
+    <section class="panel" id="panel-step3">
+      <div class="panel-inner">
+        <div class="empty-state">
+          <div class="es-icon">🎯</div>
+          <h3>Step 3 coming soon</h3>
+          <p>The path continues after Step 2.</p>
+        </div>
       </div>
-    </div>
+    </section>
   </div>
 
   <script>
     const API_BASE = 'https://hypatia-backend-production-f6fc.up.railway.app';
 
     const STEP1_QUESTIONS = {
-      1: "Think of a time you promised yourself you would only have one or just a little. What actually happened?",
-      2: "When you are not using, does your mind try to trick you into thinking it will be different this time? Give a specific example.",
-      3: "What are three things you have lost or damaged because of your addiction?",
-      4: "Looking at these answers, do you truly believe you can control this on your own?"
+      1: 'Think of a time you promised yourself you would only have one or just a little. What actually happened?',
+      2: 'When you are not using, does your mind try to trick you into thinking it will be different this time? Give a specific example.',
+      3: 'What are three things you have lost or damaged because of your addiction?',
+      4: 'Looking at these answers, do you truly believe you can control this on your own?'
     };
 
-    // ── Helpers ─────────────────────────────────────────────────────────────
-
     function esc(str) {
-      return String(str ?? '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function trunc(str, n) { str = str ?? ''; return str.length > n ? str.slice(0, n) + '…' : str; }
+    function fmtDate(s) {
+      const d = new Date(s);
+      return isNaN(d) ? s : d.toLocaleDateString('en-GB', { weekday:'short', day:'2-digit', month:'short' });
     }
 
-    function trunc(str, n) {
-      str = str ?? '';
-      return str.length > n ? str.slice(0, n) + '…' : str;
+    function showLoading() {
+      document.getElementById('loading').classList.remove('hidden');
+      document.getElementById('error').classList.add('hidden');
+      document.getElementById('app').classList.add('hidden');
+    }
+    function showError() {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('error').classList.remove('hidden');
+      document.getElementById('app').classList.add('hidden');
+    }
+    function showContent() {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('error').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
     }
 
-    function fmtDate(dateStr) {
-      const d = new Date(dateStr);
-      if (isNaN(d)) return dateStr;
-      return d.toLocaleDateString('en-GB', { weekday:'short', day:'2-digit', month:'short' });
-    }
-
-    function showEl(id)  { document.getElementById(id).style.display = ''; }
-    function hideEl(id)  { document.getElementById(id).style.display = 'none'; }
-
-    // ── Tab switching ────────────────────────────────────────────────────────
-
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', () => {
+    function setupTabs() {
+      document.querySelector('.tab-bar').addEventListener('click', e => {
+        const tab = e.target.closest('.tab');
+        if (!tab) return;
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
       });
-    });
+    }
 
-    // ── Render check-ins ─────────────────────────────────────────────────────
+    function renderHeader(data) {
+      document.getElementById('hdr-name').textContent = `Hi ${data.first_name} 👋`;
+      document.getElementById('hdr-streak').textContent = `🔥 ${data.streak} day${data.streak === 1 ? '' : 's'}`;
+    }
 
     function renderCheckins(checkins) {
-      const tbody = document.getElementById('checkins-tbody');
-
       if (!checkins || checkins.length === 0) {
-        hideEl('checkins-tbody');
-        showEl('no-checkins');
+        document.getElementById('no-checkins').classList.remove('hidden');
         return;
       }
-
+      // Mobile cards — event delegation
+      const mobileEl = document.getElementById('checkins-mobile');
+      mobileEl.addEventListener('click', e => { const c = e.target.closest('.ci-card'); if (c) c.classList.toggle('expanded'); });
+      checkins.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'ci-card';
+        card.innerHTML =
+          `<div class="ci-card-date">${esc(fmtDate(c.date))}</div>` +
+          `<div class="ci-row"><span class="ci-label">Challenge</span><span class="ci-value">${esc(c.challenge)}</span></div>` +
+          `<div class="ci-row"><span class="ci-label">Gratitude</span><span class="ci-value">${esc(c.gratitude)}</span></div>` +
+          `<div class="ci-row"><span class="ci-label">Intention</span><span class="ci-value">${esc(c.intention)}</span></div>`;
+        mobileEl.appendChild(card);
+      });
+      // Desktop table — event delegation
+      const tbody = document.getElementById('checkins-tbody');
+      tbody.addEventListener('click', e => {
+        const row = e.target.closest('tr[data-idx]');
+        if (!row) return;
+        const next = row.nextElementSibling;
+        if (next && next.classList.contains('detail-tr')) { next.remove(); return; }
+        const c = checkins[Number(row.dataset.idx)];
+        const detail = document.createElement('tr');
+        detail.className = 'detail-tr';
+        detail.innerHTML =
+          `<td colspan="4"><div class="detail-grid">` +
+          `<div><div class="detail-label">Challenge</div><div class="detail-value">${esc(c.challenge)}</div></div>` +
+          `<div><div class="detail-label">Gratitude</div><div class="detail-value">${esc(c.gratitude)}</div></div>` +
+          `<div><div class="detail-label">Intention</div><div class="detail-value">${esc(c.intention)}</div></div>` +
+          `</div></td>`;
+        row.insertAdjacentElement('afterend', detail);
+      });
       checkins.forEach((c, i) => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="date-cell">${esc(fmtDate(c.date))}</td>
-          <td>${esc(trunc(c.challenge, 80))}</td>
-          <td>${esc(trunc(c.gratitude, 80))}</td>
-          <td>${esc(trunc(c.intention, 80))}</td>
-        `;
-
-        tr.addEventListener('click', () => {
-          const isExpanded = tr.classList.contains('expanded-row');
-          // Collapse any other expanded row
-          tbody.querySelectorAll('.expanded-row').forEach(r => {
-            r.classList.remove('expanded-row');
-            r.querySelectorAll('td').forEach((td, j) => {
-              const cols = [null, r._data.challenge, r._data.gratitude, r._data.intention];
-              if (j > 0) td.textContent = trunc(cols[j], 80);
-            });
-          });
-
-          if (!isExpanded) {
-            tr.classList.add('expanded-row');
-            const tds = tr.querySelectorAll('td');
-            tds[1].textContent = c.challenge;
-            tds[2].textContent = c.gratitude;
-            tds[3].textContent = c.intention;
-          }
-        });
-
-        tr._data = c;
+        tr.dataset.idx = i;
+        tr.innerHTML =
+          `<td class="col-date">${esc(fmtDate(c.date))}</td>` +
+          `<td>${esc(trunc(c.challenge, 60))}</td>` +
+          `<td>${esc(trunc(c.gratitude, 60))}</td>` +
+          `<td>${esc(trunc(c.intention, 60))}</td>`;
         tbody.appendChild(tr);
       });
     }
 
-    // ── Render Step 1 ────────────────────────────────────────────────────────
-
     function renderStep1(answers) {
       if (!answers || answers.length === 0) {
-        showEl('step1-empty');
+        document.getElementById('step1-empty').classList.remove('hidden');
         return;
       }
-
       const container = document.getElementById('step1-cards');
       answers.forEach(a => {
-        const qText = STEP1_QUESTIONS[a.question_number] || '';
         const card = document.createElement('div');
         card.className = 'step-card';
-        card.innerHTML = `
-          <div class="step-card-label">Question ${esc(String(a.question_number))}</div>
-          <div class="step-card-question">${esc(qText)}</div>
-          <div class="step-card-answer-label">Your answer:</div>
-          <div class="step-card-answer">${esc(a.answer)}</div>
-        `;
+        card.innerHTML =
+          `<div class="sc-q-label">Q${esc(String(a.question_number))}</div>` +
+          `<div class="sc-q-text">${esc(STEP1_QUESTIONS[a.question_number] ?? '')}</div>` +
+          `<hr class="sc-divider" />` +
+          `<div class="sc-a-label">Your answer</div>` +
+          `<div class="sc-a-text">${esc(a.answer)}</div>`;
         container.appendChild(card);
       });
     }
 
-    // ── Main load ────────────────────────────────────────────────────────────
-
-    async function load() {
-      const token = new URLSearchParams(window.location.search).get('token');
-
-      if (!token) {
-        hideEl('loading');
-        showEl('error');
-        return;
-      }
-
-      try {
-        const res = await fetch(`${API_BASE}/history?token=${encodeURIComponent(token)}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-
-        // Populate header
-        document.getElementById('hdr-name').textContent =
-          `Hi ${data.first_name} 👋`;
-        document.getElementById('hdr-streak').textContent =
-          `🔥 ${data.streak} day streak`;
-
-        renderCheckins(data.checkins);
-        renderStep1(data.steps && data.steps['1'] ? data.steps['1'] : []);
-
-        hideEl('loading');
-        showEl('app');
-      } catch (err) {
-        hideEl('loading');
-        showEl('error');
-      }
+    async function fetchHistory(token) {
+      const res = await fetch(`${API_BASE}/history?token=${encodeURIComponent(token)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
     }
 
-    load();
+    function init() {
+      setupTabs();
+      const token = new URLSearchParams(window.location.search).get('token');
+      if (!token) { showError(); return; }
+      showLoading();
+      fetchHistory(token)
+        .then(data => {
+          renderHeader(data);
+          renderCheckins(data.checkins);
+          renderStep1(data.steps && data.steps['1'] ? data.steps['1'] : []);
+          showContent();
+        })
+        .catch(() => showError());
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 
 </body>
