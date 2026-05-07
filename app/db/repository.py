@@ -271,8 +271,8 @@ async def delete_step_answers(
 
 async def validate_token(session: AsyncSession, token: str) -> Optional[int]:
     """
-    Returns the user_id if the token is valid, unexpired, and unused.
-    Marks it as used on success.
+    Returns the user_id if the token exists and has not expired.
+    Token stays valid for its full 24-hour window and can be used multiple times.
     """
     result = await session.execute(
         select(MagicLink).where(MagicLink.token == token)
@@ -280,8 +280,6 @@ async def validate_token(session: AsyncSession, token: str) -> Optional[int]:
     link = result.scalar_one_or_none()
 
     if not link:
-        return None
-    if link.used:
         return None
 
     now = datetime.now(timezone.utc)
@@ -292,5 +290,4 @@ async def validate_token(session: AsyncSession, token: str) -> Optional[int]:
     if now > expires:
         return None
 
-    link.used = True
     return link.user_id
