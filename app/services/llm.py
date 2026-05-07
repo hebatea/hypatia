@@ -24,6 +24,11 @@ FALLBACK_REFLECTION = (
     "See you tomorrow. 🌿"
 )
 
+FALLBACK_STEP_REFLECTION = (
+    "Thank you for your honesty. What you just did takes real courage. "
+    "Keep going — one step at a time. 🌿"
+)
+
 FALLBACK_REMINDER = (
     "Hey — time to check in with yourself. How was today? /checkin"
 )
@@ -80,6 +85,63 @@ Write their reflection now."""
     except Exception as e:
         logger.error(f"LLM reflection failed: {e}", exc_info=True)
         return FALLBACK_REFLECTION
+
+
+async def generate_step_reflection(
+    step_number: int,
+    answers: dict[int, str],
+    first_name: str = "friend",
+) -> str:
+    """
+    Generates a warm, personal reflection after a user completes a step.
+    answers: {question_number: answer_text}
+    """
+    step_names = {1: "Step 1", 2: "Step 2", 3: "Step 3"}
+    step_name = step_names.get(step_number, f"Step {step_number}")
+
+    formatted_answers = "\n".join(
+        f"- Q{q}: {a}" for q, a in sorted(answers.items())
+    )
+
+    step3_extra = (
+        " For step 3 specifically — be especially warm and acknowledge the "
+        "courage it takes to write a surrender letter."
+        if step_number == 3 else ""
+    )
+
+    system_prompt = f"""You are Hypatia, a warm and grounded companion for people in 12-step recovery.
+
+Your role: After a user completes {step_name}, write a brief personal reflection (3-4 sentences maximum).
+
+Rules you MUST follow:
+- Read the user's actual answers and reference them specifically — do not be generic
+- Be warm, grounded, and recovery-aware
+- Never give clinical advice or diagnose
+- Keep it to 3-4 sentences maximum
+- Acknowledge which step they just completed{step3_extra}
+- Never be preachy or quote 12-step literature"""
+
+    user_message = f"""{first_name} just completed {step_name}.
+
+Their answers:
+{formatted_answers}
+
+Write their reflection now."""
+
+    try:
+        logger.info(f"Calling LLM for step reflection — step={step_number}")
+        response = _client.messages.create(
+            model=config.LLM_MODEL,
+            max_tokens=config.LLM_MAX_TOKENS,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_message}],
+        )
+        text = response.content[0].text.strip()
+        logger.info("LLM step reflection succeeded")
+        return text
+    except Exception as e:
+        logger.error(f"LLM step reflection failed: {e}", exc_info=True)
+        return FALLBACK_STEP_REFLECTION
 
 
 async def generate_reminder(
