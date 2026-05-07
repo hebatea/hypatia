@@ -32,6 +32,12 @@ from app.handlers.settings import (
     cmd_resume,
     cmd_streak,
 )
+from app.handlers.steps import (
+    callback_step,
+    cmd_step1,
+    handle_step_message,
+    handle_step_voice,
+)
 
 
 def create_bot() -> Application:
@@ -50,21 +56,36 @@ def create_bot() -> Application:
     app.add_handler(CommandHandler("remind", cmd_remind))
     app.add_handler(CommandHandler("pause", cmd_pause))
     app.add_handler(CommandHandler("resume", cmd_resume))
+    app.add_handler(CommandHandler("step1", cmd_step1))
 
     # ── Callback queries ──────────────────────────────────────────────────
     app.add_handler(CallbackQueryHandler(callback_timezone, pattern=r"^tz:"))
     app.add_handler(CallbackQueryHandler(callback_reminder_time, pattern=r"^rt:"))
     app.add_handler(CallbackQueryHandler(callback_checkin_flow, pattern=r"^checkin:"))
     app.add_handler(CallbackQueryHandler(callback_nav, pattern=r"^nav:"))
+    app.add_handler(CallbackQueryHandler(callback_step, pattern=r"^step:"))
 
-    # ── Free text messages (state machine routes them) ────────────────────
+    # ── Free text messages ────────────────────────────────────────────────
+    # Group 0: check-in flow. Group 1: step flows.
+    # PTB runs each group independently, so both handlers always get a chance.
+    # Each handler returns early if the user's state doesn't match its flow.
     app.add_handler(
-        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_checkin_message)
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_checkin_message),
+        group=0,
+    )
+    app.add_handler(
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_step_message),
+        group=1,
     )
 
-    # ── Voice messages (transcribed then routed through check-in flow) ────
+    # ── Voice messages ────────────────────────────────────────────────────
     app.add_handler(
-        MessageHandler(filters.VOICE, handle_voice_message)
+        MessageHandler(filters.VOICE, handle_voice_message),
+        group=0,
+    )
+    app.add_handler(
+        MessageHandler(filters.VOICE, handle_step_voice),
+        group=1,
     )
 
     return app

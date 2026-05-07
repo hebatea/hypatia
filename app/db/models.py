@@ -49,6 +49,7 @@ class User(Base):
     checkins = relationship("Checkin", back_populates="user", cascade="all, delete-orphan")
     reminder_logs = relationship("ReminderLog", back_populates="user", cascade="all, delete-orphan")
     magic_links = relationship("MagicLink", back_populates="user", cascade="all, delete-orphan")
+    step_entries = relationship("StepEntry", back_populates="user", cascade="all, delete-orphan")
 
 
 class Checkin(Base):
@@ -94,3 +95,16 @@ class MagicLink(Base):
     used = Column(Boolean, default=False, nullable=False)
 
     user = relationship("User", back_populates="magic_links")
+
+
+class StepEntry(Base):
+    __tablename__ = "step_entries"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    step_number = Column(Integer, nullable=False)       # 1, 2, or 3
+    question_number = Column(Integer, nullable=False)   # 1-based
+    answer = Column(Text, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+    user = relationship("User", back_populates="step_entries")

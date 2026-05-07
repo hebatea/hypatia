@@ -40,6 +40,14 @@ def checkin_resume_keyboard() -> InlineKeyboardMarkup:
     ]])
 
 
+def step_redo_keyboard(step_number: int) -> InlineKeyboardMarkup:
+    """Shown when a user has already completed a step."""
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton("📖 Review", callback_data=f"step:review:{step_number}"),
+        InlineKeyboardButton("🔄 Start over", callback_data=f"step:restart:{step_number}"),
+    ]])
+
+
 def already_done_keyboard() -> InlineKeyboardMarkup:
     """Shown when user has already checked in today."""
     return InlineKeyboardMarkup([[

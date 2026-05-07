@@ -9,7 +9,7 @@ from typing import Optional
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Checkin, MagicLink, ReminderLog, User
+from app.db.models import Checkin, MagicLink, ReminderLog, StepEntry, User
 
 
 # ─── USER ──────────────────────────────────────────────────────────────────
@@ -207,6 +207,66 @@ async def create_magic_link(session: AsyncSession, user_id: int) -> str:
     session.add(link)
     await session.flush()
     return token
+
+
+# ─── STEP ENTRIES ──────────────────────────────────────────────────────────
+
+
+async def save_step_answer(
+    session: AsyncSession,
+    user_id: int,
+    step_number: int,
+    question_number: int,
+    answer: str,
+) -> StepEntry:
+    entry = StepEntry(
+        user_id=user_id,
+        step_number=step_number,
+        question_number=question_number,
+        answer=answer,
+    )
+    session.add(entry)
+    await session.flush()
+    return entry
+
+
+async def get_step_answers(
+    session: AsyncSession,
+    user_id: int,
+    step_number: int,
+) -> list[StepEntry]:
+    result = await session.execute(
+        select(StepEntry)
+        .where(StepEntry.user_id == user_id, StepEntry.step_number == step_number)
+        .order_by(StepEntry.question_number)
+    )
+    return list(result.scalars().all())
+
+
+# Maps step_number → total questions in that step
+_STEP_QUESTION_COUNTS = {1: 4, 2: 3, 3: 3}
+
+
+async def has_completed_step(
+    session: AsyncSession,
+    user_id: int,
+    step_number: int,
+) -> bool:
+    entries = await get_step_answers(session, user_id, step_number)
+    required = _STEP_QUESTION_COUNTS.get(step_number, 0)
+    answered = {e.question_number for e in entries}
+    return all(q in answered for q in range(1, required + 1))
+
+
+async def delete_step_answers(
+    session: AsyncSession,
+    user_id: int,
+    step_number: int,
+) -> None:
+    entries = await get_step_answers(session, user_id, step_number)
+    for entry in entries:
+        await session.delete(entry)
+    await session.flush()
 
 
 async def validate_token(session: AsyncSession, token: str) -> Optional[int]:
