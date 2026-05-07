@@ -3,281 +3,445 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hypatia — Your History</title>
+  <title>Hypatia — My History</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green: #0F6E56;
-      --green-light: #e8f5f1;
-      --green-mid: #d0ece5;
-      --text: #1a1a1a;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --radius: 12px;
+      --teal: #0F6E56;
+      --teal-light: #E1F5EE;
+      --bg: #F7FAF9;
+      --text: #1A2E2A;
+      --gray: #64748B;
+      --border: #E2E8F0;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f9fafb;
+      background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 24px 16px 48px;
     }
 
-    header {
+    /* ── Header ─────────────────────────────────────────────── */
+    .header {
+      background: var(--teal);
+      color: white;
+      padding: 28px 20px 24px;
       text-align: center;
-      margin-bottom: 32px;
     }
-
-    header .logo {
+    .header-name {
       font-size: 1.6rem;
       font-weight: 700;
-      color: var(--green);
-      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .header-streak {
+      font-size: 1rem;
+      opacity: 0.9;
     }
 
-    header .tagline {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 4px;
+    /* ── Tab bar ─────────────────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex: 1;
+      min-width: 80px;
+      padding: 14px 8px 12px;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--gray);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      user-select: none;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab.active {
+      color: var(--teal);
+      border-bottom-color: var(--teal);
     }
 
-    .card {
+    /* ── Panels ──────────────────────────────────────────────── */
+    .panel { display: none; padding: 20px 16px 48px; }
+    .panel.active { display: block; }
+
+    /* ── Check-ins table ─────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+      font-size: 0.87rem;
+    }
+    thead tr {
+      background: var(--teal);
+      color: white;
+    }
+    thead th {
+      padding: 11px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.03em;
+    }
+    tbody tr {
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    tbody tr:nth-child(odd)  { background: white; }
+    tbody tr:nth-child(even) { background: var(--bg); }
+    tbody tr:hover { background: var(--teal-light); }
+    tbody td {
+      padding: 11px 14px;
+      vertical-align: top;
+      border-top: 1px solid var(--border);
+      line-height: 1.45;
+    }
+    td.date-cell {
+      white-space: nowrap;
+      color: var(--gray);
+      font-size: 0.8rem;
+    }
+    .expanded-row td {
+      background: var(--teal-light) !important;
+      white-space: normal;
+    }
+    .no-data {
+      text-align: center;
+      color: var(--gray);
+      padding: 48px 20px;
+      font-size: 0.95rem;
+    }
+
+    /* ── Step cards ──────────────────────────────────────────── */
+    .step-card {
       background: white;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      max-width: 640px;
-      margin: 0 auto 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      padding: 16px;
+      margin-bottom: 12px;
     }
-
-    .hero {
-      background: var(--green);
-      color: white;
-      border: none;
-      text-align: center;
-      padding: 28px 20px;
+    .step-card-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gray);
+      margin-bottom: 6px;
     }
-
-    .hero .name {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 8px;
+    .step-card-question {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.5;
     }
-
-    .hero .streak-label {
-      font-size: 0.85rem;
-      opacity: 0.8;
+    .step-card-answer-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--teal);
       text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: 4px;
     }
-
-    .hero .streak-count {
-      font-size: 3rem;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .hero .streak-unit {
-      font-size: 0.95rem;
-      opacity: 0.85;
-      margin-top: 4px;
-    }
-
-    .section-title {
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--muted);
-      max-width: 640px;
-      margin: 0 auto 10px;
-    }
-
-    .checkin-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      max-width: 640px;
-      margin: 0 auto 12px;
-    }
-
-    .checkin-date {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--green);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 12px;
-    }
-
-    .field {
-      margin-bottom: 10px;
-    }
-
-    .field:last-child { margin-bottom: 0; }
-
-    .field-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 3px;
-    }
-
-    .field-value {
-      font-size: 0.92rem;
-      line-height: 1.5;
+    .step-card-answer {
+      font-size: 0.9rem;
+      line-height: 1.6;
       color: var(--text);
     }
 
-    /* States */
-    .state {
+    /* ── Coming soon / empty states ──────────────────────────── */
+    .coming-soon {
       text-align: center;
+      color: var(--gray);
       padding: 60px 20px;
-      color: var(--muted);
-      max-width: 640px;
-      margin: 0 auto;
     }
-
-    .state .icon {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
+    .coming-soon .cs-icon {
+      font-size: 2.4rem;
+      margin-bottom: 14px;
     }
-
-    .state h2 {
-      font-size: 1.1rem;
+    .coming-soon h2 {
+      font-size: 1.05rem;
       color: var(--text);
       margin-bottom: 8px;
     }
-
-    .state p {
-      font-size: 0.9rem;
-      line-height: 1.6;
+    .coming-soon p {
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    .coming-soon code {
+      background: var(--teal-light);
+      color: var(--teal);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.88rem;
     }
 
+    /* ── Full-page states ────────────────────────────────────── */
+    .full-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 24px;
+      text-align: center;
+    }
     .spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid var(--green-mid);
-      border-top-color: var(--green);
+      width: 40px;
+      height: 40px;
+      border: 3px solid #c7e8de;
+      border-top-color: var(--teal);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
+      animation: spin 0.75s linear infinite;
+      margin-bottom: 18px;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
+    .full-state h2 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .full-state p {
+      font-size: 0.9rem;
+      color: var(--gray);
+      line-height: 1.7;
+      max-width: 320px;
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo">Hypatia</div>
-    <div class="tagline">Your daily reflection history</div>
-  </header>
+  <div id="loading" class="full-state">
+    <div class="spinner"></div>
+    <p>Loading your history…</p>
+  </div>
 
-  <div id="app">
-    <div class="state">
-      <div class="spinner"></div>
-      <p>Loading your history…</p>
+  <div id="error" class="full-state" style="display:none;">
+    <div style="font-size:2.4rem;margin-bottom:14px;">🔒</div>
+    <h2>Link expired or not valid</h2>
+    <p>Open the bot and send <code>/myhistory</code> to get a fresh link.</p>
+  </div>
+
+  <div id="app" style="display:none;">
+    <div class="header">
+      <div class="header-name" id="hdr-name"></div>
+      <div class="header-streak" id="hdr-streak"></div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active" data-tab="checkins">Check-ins</div>
+      <div class="tab"        data-tab="step1">Step 1</div>
+      <div class="tab"        data-tab="step2">Step 2</div>
+      <div class="tab"        data-tab="step3">Step 3</div>
+    </div>
+
+    <!-- Check-ins panel -->
+    <div class="panel active" id="panel-checkins">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Challenge</th>
+              <th>Gratitude</th>
+              <th>Intention</th>
+            </tr>
+          </thead>
+          <tbody id="checkins-tbody"></tbody>
+        </table>
+      </div>
+      <div id="no-checkins" class="no-data" style="display:none;">No check-ins yet.</div>
+    </div>
+
+    <!-- Step 1 panel -->
+    <div class="panel" id="panel-step1">
+      <div id="step1-empty" class="coming-soon" style="display:none;">
+        <div class="cs-icon">📋</div>
+        <h2>You haven't completed Step 1 yet.</h2>
+        <p>Use <code>/step1</code> in the bot to begin.</p>
+      </div>
+      <div id="step1-cards"></div>
+    </div>
+
+    <!-- Step 2 panel -->
+    <div class="panel" id="panel-step2">
+      <div class="coming-soon">
+        <div class="cs-icon">🌿</div>
+        <h2>Step 2 is coming soon.</h2>
+        <p>Once you have completed Step 1, use <code>/step2</code> in the bot to continue your journey.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 panel -->
+    <div class="panel" id="panel-step3">
+      <div class="coming-soon">
+        <div class="cs-icon">🌿</div>
+        <h2>Step 3 is coming soon.</h2>
+        <p>The path continues after Step 2.</p>
+      </div>
     </div>
   </div>
 
   <script>
-    const API_BASE = "https://hypatia-backend-production-f6fc.up.railway.app";
+    const API_BASE = 'https://hypatia-backend.up.railway.app';
+
+    const STEP1_QUESTIONS = {
+      1: "Think of a time you promised yourself you would only have one or just a little. What actually happened?",
+      2: "When you are not using, does your mind try to trick you into thinking it will be different this time? Give a specific example.",
+      3: "What are three things you have lost or damaged because of your addiction?",
+      4: "Looking at these answers, do you truly believe you can control this on your own?"
+    };
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+
+    function esc(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function trunc(str, n) {
+      str = str ?? '';
+      return str.length > n ? str.slice(0, n) + '…' : str;
+    }
+
+    function fmtDate(dateStr) {
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      return d.toLocaleDateString('en-GB', { weekday:'short', day:'2-digit', month:'short' });
+    }
+
+    function showEl(id)  { document.getElementById(id).style.display = ''; }
+    function hideEl(id)  { document.getElementById(id).style.display = 'none'; }
+
+    // ── Tab switching ────────────────────────────────────────────────────────
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ── Render check-ins ─────────────────────────────────────────────────────
+
+    function renderCheckins(checkins) {
+      const tbody = document.getElementById('checkins-tbody');
+
+      if (!checkins || checkins.length === 0) {
+        hideEl('checkins-tbody');
+        showEl('no-checkins');
+        return;
+      }
+
+      checkins.forEach((c, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="date-cell">${esc(fmtDate(c.date))}</td>
+          <td>${esc(trunc(c.challenge, 80))}</td>
+          <td>${esc(trunc(c.gratitude, 80))}</td>
+          <td>${esc(trunc(c.intention, 80))}</td>
+        `;
+
+        tr.addEventListener('click', () => {
+          const isExpanded = tr.classList.contains('expanded-row');
+          // Collapse any other expanded row
+          tbody.querySelectorAll('.expanded-row').forEach(r => {
+            r.classList.remove('expanded-row');
+            r.querySelectorAll('td').forEach((td, j) => {
+              const cols = [null, r._data.challenge, r._data.gratitude, r._data.intention];
+              if (j > 0) td.textContent = trunc(cols[j], 80);
+            });
+          });
+
+          if (!isExpanded) {
+            tr.classList.add('expanded-row');
+            const tds = tr.querySelectorAll('td');
+            tds[1].textContent = c.challenge;
+            tds[2].textContent = c.gratitude;
+            tds[3].textContent = c.intention;
+          }
+        });
+
+        tr._data = c;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ── Render Step 1 ────────────────────────────────────────────────────────
+
+    function renderStep1(answers) {
+      if (!answers || answers.length === 0) {
+        showEl('step1-empty');
+        return;
+      }
+
+      const container = document.getElementById('step1-cards');
+      answers.forEach(a => {
+        const qText = STEP1_QUESTIONS[a.question_number] || '';
+        const card = document.createElement('div');
+        card.className = 'step-card';
+        card.innerHTML = `
+          <div class="step-card-label">Question ${esc(String(a.question_number))}</div>
+          <div class="step-card-question">${esc(qText)}</div>
+          <div class="step-card-answer-label">Your answer:</div>
+          <div class="step-card-answer">${esc(a.answer)}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ── Main load ────────────────────────────────────────────────────────────
 
     async function load() {
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token");
+      const token = new URLSearchParams(window.location.search).get('token');
 
       if (!token) {
-        renderError(
-          "No link token found",
-          "Use /myhistory in the Hypatia bot to generate a personal history link."
-        );
+        hideEl('loading');
+        showEl('error');
         return;
       }
 
       try {
         const res = await fetch(`${API_BASE}/history?token=${encodeURIComponent(token)}`);
-        if (res.status === 401) {
-          renderError(
-            "Link expired or already used",
-            "Magic links are valid for 24 hours and can only be used once. Use /myhistory in the bot to get a new one."
-          );
-          return;
-        }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
         const data = await res.json();
-        renderHistory(data);
+
+        // Populate header
+        document.getElementById('hdr-name').textContent =
+          `Hi ${data.first_name} 👋`;
+        document.getElementById('hdr-streak').textContent =
+          `🔥 ${data.streak} day streak`;
+
+        renderCheckins(data.checkins);
+        renderStep1(data.steps && data.steps['1'] ? data.steps['1'] : []);
+
+        hideEl('loading');
+        showEl('app');
       } catch (err) {
-        renderError(
-          "Could not load your history",
-          "Something went wrong. Please try again or generate a new link with /myhistory."
-        );
+        hideEl('loading');
+        showEl('error');
       }
-    }
-
-    function renderHistory(data) {
-      const app = document.getElementById("app");
-
-      const checkinCards = data.checkins.map(c => `
-        <div class="checkin-card">
-          <div class="checkin-date">${c.date}</div>
-          <div class="field">
-            <div class="field-label">Challenge</div>
-            <div class="field-value">${escHtml(c.challenge)}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Gratitude</div>
-            <div class="field-value">${escHtml(c.gratitude)}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Intention</div>
-            <div class="field-value">${escHtml(c.intention)}</div>
-          </div>
-        </div>
-      `).join("");
-
-      const empty = data.checkins.length === 0
-        ? `<div class="state"><div class="icon">📝</div><h2>No check-ins yet</h2><p>Start your first one with /checkin in the bot.</p></div>`
-        : "";
-
-      app.innerHTML = `
-        <div class="card hero">
-          <div class="name">Hey, ${escHtml(data.first_name)} 👋</div>
-          <div class="streak-label">Current streak</div>
-          <div class="streak-count">${data.streak}</div>
-          <div class="streak-unit">day${data.streak === 1 ? "" : "s"}</div>
-        </div>
-
-        ${data.checkins.length > 0 ? `<div class="section-title">Last ${data.checkins.length} check-in${data.checkins.length === 1 ? "" : "s"}</div>` : ""}
-        ${checkinCards}
-        ${empty}
-      `;
-    }
-
-    function renderError(title, message) {
-      document.getElementById("app").innerHTML = `
-        <div class="state">
-          <div class="icon">🔒</div>
-          <h2>${escHtml(title)}</h2>
-          <p>${escHtml(message)}</p>
-        </div>
-      `;
-    }
-
-    function escHtml(str) {
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
     }
 
     load();
