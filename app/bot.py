@@ -24,7 +24,9 @@ from app.handlers.onboarding import (
     cmd_start,
 )
 from app.handlers.settings import (
+    callback_delete,
     callback_nav,
+    cmd_deletedata,
     cmd_history,
     cmd_myhistory,
     cmd_pause,
@@ -57,6 +59,7 @@ def create_bot() -> Application:
     app.add_handler(CommandHandler("pause", cmd_pause))
     app.add_handler(CommandHandler("resume", cmd_resume))
     app.add_handler(CommandHandler("step1", cmd_step1))
+    app.add_handler(CommandHandler("deletedata", cmd_deletedata))
 
     # ── Callback queries ──────────────────────────────────────────────────
     app.add_handler(CallbackQueryHandler(callback_timezone, pattern=r"^tz:"))
@@ -64,6 +67,7 @@ def create_bot() -> Application:
     app.add_handler(CallbackQueryHandler(callback_checkin_flow, pattern=r"^checkin:"))
     app.add_handler(CallbackQueryHandler(callback_nav, pattern=r"^nav:"))
     app.add_handler(CallbackQueryHandler(callback_step, pattern=r"^step:"))
+    app.add_handler(CallbackQueryHandler(callback_delete, pattern=r"^delete:"))
 
     # ── Free text messages ────────────────────────────────────────────────
     # Group 0: check-in flow. Group 1: step flows.

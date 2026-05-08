@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hypatia — Privacy Policy</title>
+  <style>
+    :root {
+      --teal: #0F6E56; --teal-light: #E1F5EE;
+      --bg: #F7FAF9; --surface: #FFFFFF; --text: #1A2E2A;
+      --text-secondary: #64748B; --border: #E2E8F0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06); --radius: 10px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.7; padding: 32px 16px 64px; }
+    .wrap { max-width: 640px; margin: 0 auto; }
+
+    .site-name { font-size: 1.4rem; font-weight: 700; color: var(--teal); }
+    .page-title { font-size: 1.1rem; font-weight: 500; color: var(--text); margin-top: 4px; }
+    .updated { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    header { margin-bottom: 32px; }
+
+    section { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 20px; margin-bottom: 12px; }
+    h2 { font-size: 14px; font-weight: 600; color: var(--teal); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+    p { font-size: 14px; color: var(--text); margin-bottom: 8px; }
+    p:last-child { margin-bottom: 0; }
+    ul { padding-left: 18px; margin-top: 4px; }
+    li { font-size: 14px; color: var(--text); margin-bottom: 4px; }
+    code { background: var(--teal-light); color: var(--teal); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+
+    footer { text-align: center; font-size: 13px; color: var(--text-secondary); margin-top: 32px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <div class="site-name">Hypatia</div>
+      <div class="page-title">Privacy Policy</div>
+      <div class="updated">Last updated: 8 May 2026</div>
+    </header>
+
+    <section>
+      <h2>What we collect</h2>
+      <ul>
+        <li>Your Telegram user ID and first name</li>
+        <li>Your daily check-in answers</li>
+        <li>Your step work answers (Steps 1, 2, 3)</li>
+        <li>Your reminder time and timezone</li>
+        <li>Date and time of each entry</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>What we do not collect</h2>
+      <ul>
+        <li>Your phone number</li>
+        <li>Your full name</li>
+        <li>Payment information</li>
+        <li>Your location beyond timezone</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Where your data is stored</h2>
+      <p>Your data is stored in PostgreSQL hosted by Supabase and the bot runs on Railway. Both use encrypted storage in secure data centres.</p>
+    </section>
+
+    <section>
+      <h2>Who can see your data</h2>
+      <p>Only the operator of this bot. Your answers are never shared with third parties, never used for advertising, and never sold.</p>
+    </section>
+
+    <section>
+      <h2>How long we keep it</h2>
+      <p>Your data is kept for as long as you use the bot. Delete everything at any time with <code>/deletedata</code> in the bot. Deletion is immediate and permanent.</p>
+    </section>
+
+    <section>
+      <h2>AI processing</h2>
+      <p>Your check-in and step answers are sent to Anthropic's API to generate a personalised reflection. Your answers are not used to train AI models.</p>
+    </section>
+
+    <section>
+      <h2>Your rights</h2>
+      <p>Access your data with <code>/myhistory</code>.</p>
+      <p>Delete your data with <code>/deletedata</code>.</p>
+    </section>
+
+    <footer>Hypatia · Privacy Policy · 2026</footer>
+
+  </div>
+</body>
+</html>

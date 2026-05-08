@@ -14,7 +14,7 @@ from telegram.ext import ContextTypes
 from app.config import config
 from app.db.engine import get_session
 from app.db import repository as repo
-from app.handlers.keyboards import reminder_time_keyboard, timezone_keyboard
+from app.handlers.keyboards import delete_confirm_keyboard, reminder_time_keyboard, timezone_keyboard
 from app.handlers.states import IDLE, ONBOARDING_TIME, ONBOARDING_TZ
 
 logger = logging.getLogger(__name__)
@@ -123,6 +123,35 @@ async def cmd_resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await update.message.reply_text(
         f"Reminders back on ▶ I'll message you at {time_str} each day."
     )
+
+
+async def cmd_deletedata(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Asks for explicit confirmation before deleting all user data."""
+    await update.message.reply_text(
+        "⚠️ This will permanently delete all your data — "
+        "check-ins, step answers, streak, and account.\n\n"
+        "This cannot be undone. Are you sure?",
+        reply_markup=delete_confirm_keyboard(),
+    )
+
+
+async def callback_delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handles delete:confirm and delete:cancel callbacks."""
+    query = update.callback_query
+    await query.answer()
+    action = query.data.split(":", 1)[1]
+    user_id = query.from_user.id
+
+    if action == "confirm":
+        async with get_session() as session:
+            await repo.delete_all_user_data(session, user_id)
+        await query.edit_message_text(
+            "✓ All your data has been deleted.\n\n"
+            "If you ever want to start again, send /start."
+        )
+
+    elif action == "cancel":
+        await query.edit_message_text("Cancelled. Your data is safe. 🌿")
 
 
 async def callback_nav(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
