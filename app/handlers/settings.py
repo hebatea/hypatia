@@ -125,6 +125,13 @@ async def cmd_resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     )
 
 
+async def cmd_privacy(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(
+        f"Our privacy policy:\n\n{config.WEB_BASE_URL}/privacy",
+        disable_web_page_preview=True,
+    )
+
+
 async def cmd_deletedata(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Asks for explicit confirmation before deleting all user data."""
     await update.message.reply_text(
