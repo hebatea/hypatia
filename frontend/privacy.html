@@ -4,41 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hypatia — Privacy Policy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --teal: #0F6E56; --teal-light: #E1F5EE;
-      --bg: #F7FAF9; --surface: #FFFFFF; --text: #1A2E2A;
-      --text-secondary: #64748B; --border: #E2E8F0;
-      --shadow: 0 1px 3px rgba(0,0,0,0.06); --radius: 10px;
-      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --bg:     #FAFAF9;
+      --surface:#FFFFFF;
+      --teal:   #0F6E56;
+      --text:   #111827;
+      --text-2: #6B7280;
+      --border: #E5E7EB;
+      --font:   'Inter', -apple-system, sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.7; padding: 32px 16px 64px; }
-    .wrap { max-width: 640px; margin: 0 auto; }
+    body { background: var(--bg); font-family: var(--font); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; }
 
-    .site-name { font-size: 1.4rem; font-weight: 700; color: var(--teal); }
-    .page-title { font-size: 1.1rem; font-weight: 500; color: var(--text); margin-top: 4px; }
-    .updated { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-    header { margin-bottom: 32px; }
+    .wrap { max-width: 600px; margin: 0 auto; padding: 40px 24px; }
+    @media (max-width: 600px) { .wrap { padding: 32px 20px; } }
 
-    section { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 20px; margin-bottom: 12px; }
-    h2 { font-size: 14px; font-weight: 600; color: var(--teal); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
-    p { font-size: 14px; color: var(--text); margin-bottom: 8px; }
-    p:last-child { margin-bottom: 0; }
-    ul { padding-left: 18px; margin-top: 4px; }
-    li { font-size: 14px; color: var(--text); margin-bottom: 4px; }
-    code { background: var(--teal-light); color: var(--teal); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+    /* Header */
+    .brand      { font-size: 13px; font-weight: 500; color: var(--teal); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    h1          { font-size: 28px; font-weight: 500; color: var(--text); line-height: 1.2; }
+    .updated    { font-size: 13px; color: var(--text-2); margin-top: 6px; }
+    header      { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
 
-    footer { text-align: center; font-size: 13px; color: var(--text-secondary); margin-top: 32px; }
+    /* Sections */
+    section     { margin-bottom: 32px; }
+    h2          { font-size: 13px; font-weight: 500; color: var(--teal); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+    p           { font-size: 15px; color: var(--text); }
+    p + p       { margin-top: 6px; }
+    ul          { padding-left: 18px; list-style-type: disc; }
+    li          { font-size: 15px; color: var(--text-2); margin-bottom: 4px; }
+    code        { font-family: var(--font); font-size: 14px; color: var(--teal); }
+
+    /* Footer */
+    footer      { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; font-size: 13px; color: var(--text-2); }
   </style>
 </head>
 <body>
   <div class="wrap">
 
     <header>
-      <div class="site-name">Hypatia</div>
-      <div class="page-title">Privacy Policy</div>
-      <div class="updated">Last updated: 8 May 2026</div>
+      <div class="brand">Hypatia</div>
+      <h1>Privacy Policy</h1>
+      <div class="updated">Last updated: May 2026</div>
     </header>
 
     <section>
