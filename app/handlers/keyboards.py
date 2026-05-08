@@ -48,6 +48,14 @@ def step_redo_keyboard(step_number: int) -> InlineKeyboardMarkup:
     ]])
 
 
+def delete_confirm_keyboard() -> InlineKeyboardMarkup:
+    """Shown when user requests /deletedata — requires explicit confirmation."""
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton("🗑 Yes, delete everything", callback_data="delete:confirm"),
+        InlineKeyboardButton("← Cancel", callback_data="delete:cancel"),
+    ]])
+
+
 def already_done_keyboard() -> InlineKeyboardMarkup:
     """Shown when user has already checked in today."""
     return InlineKeyboardMarkup([[

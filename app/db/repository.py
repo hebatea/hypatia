@@ -6,7 +6,7 @@ import secrets
 from datetime import date, datetime, time, timedelta, timezone
 from typing import Optional
 
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, delete as sql_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Checkin, MagicLink, ReminderLog, StepEntry, User
@@ -266,6 +266,24 @@ async def delete_step_answers(
     entries = await get_step_answers(session, user_id, step_number)
     for entry in entries:
         await session.delete(entry)
+    await session.flush()
+
+
+# ─── USER DELETION ─────────────────────────────────────────────────────────
+
+
+async def delete_all_user_data(session: AsyncSession, user_id: int) -> None:
+    """
+    Permanently deletes all data for a user.
+    Order respects FK constraints: child tables first, users row last.
+    """
+    await session.execute(sql_delete(MagicLink).where(MagicLink.user_id == user_id))
+    await session.execute(sql_delete(ReminderLog).where(ReminderLog.user_id == user_id))
+    await session.execute(sql_delete(StepEntry).where(StepEntry.user_id == user_id))
+    await session.execute(sql_delete(Checkin).where(Checkin.user_id == user_id))
+    user = await session.get(User, user_id)
+    if user:
+        await session.delete(user)
     await session.flush()
 
 
