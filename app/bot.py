@@ -30,6 +30,7 @@ from app.handlers.settings import (
     cmd_history,
     cmd_myhistory,
     cmd_pause,
+    cmd_privacy,
     cmd_remind,
     cmd_resume,
     cmd_streak,
@@ -60,6 +61,7 @@ def create_bot() -> Application:
     app.add_handler(CommandHandler("resume", cmd_resume))
     app.add_handler(CommandHandler("step1", cmd_step1))
     app.add_handler(CommandHandler("deletedata", cmd_deletedata))
+    app.add_handler(CommandHandler("privacy", cmd_privacy))
 
     # ── Callback queries ──────────────────────────────────────────────────
     app.add_handler(CallbackQueryHandler(callback_timezone, pattern=r"^tz:"))
