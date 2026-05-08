@@ -31,9 +31,12 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         if not created and already_set_up:
             await update.message.reply_text(
-                f"Welcome back, {tg_user.first_name} 🌿\n\n"
-                "Use /checkin to log today, /streak for your streak, "
-                "or /remind to change your reminder time."
+                f"Welcome back {tg_user.first_name} 🌿\n\n"
+                "You're already set up. Your reminder is running "
+                "and your journey is saved.\n\n"
+                "Pick up where you left off:\n\n"
+                "/checkin · Daily check-in\n"
+                "/step1 · The Foundation of Honesty"
             )
             return
 
@@ -41,12 +44,16 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await repo.update_user_state(session, tg_user.id, ONBOARDING_TZ)
 
     await update.message.reply_text(
-        f"Hey {tg_user.first_name} 👋\n\n"
-        "I'm Hypatia — your daily recovery companion.\n\n"
-        "I'll check in with you every evening with three simple questions. "
-        "Takes about two minutes.\n\n"
-        "First — *what timezone are you in?*",
-        parse_mode="Markdown",
+        "Welcome to Hypatia 🌿\n\n"
+        "This is your private daily companion for recovery.\n\n"
+        "A safe space to be honest — with yourself, about "
+        "yourself. No judgment. No audience. Just you.\n\n"
+        "Every evening I'll check in with you. Three simple "
+        "questions. Two minutes. And over time, something shifts.\n\n"
+        "🔒 Everything you share here is private. Only you "
+        "can see your answers. Send /privacy anytime.\n\n"
+        "But first — let's get you set up.\n\n"
+        "What timezone are you in?",
         reply_markup=timezone_keyboard(),
     )
 
@@ -68,9 +75,10 @@ async def callback_timezone(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         await repo.update_user_state(session, user_id, ONBOARDING_TIME)
 
     await query.edit_message_text(
-        f"Great — *{timezone}* ✓\n\n"
-        "What time should I remind you each evening?",
-        parse_mode="Markdown",
+        "Got it ✓\n\n"
+        "What time should I check in with you each evening?\n\n"
+        "Pick a time when the day is winding down and you "
+        "have two quiet minutes.",
         reply_markup=reminder_time_keyboard(),
     )
 
@@ -98,12 +106,12 @@ async def callback_reminder_time(
         await repo.update_user_state(session, user_id, IDLE)
 
     await query.edit_message_text(
-        f"Perfect — I'll remind you every day at *{time_str}* 🔔\n\n"
-        "You're all set. Whenever you're ready:\n\n"
-        "/checkin — start today's check-in\n"
-        "/streak — see your streak\n"
-        "/history — past entries\n"
-        "/pause — pause reminders\n"
-        "/remind — change reminder time",
+        f"You're all set 🌱\n\n"
+        f"I'll be here every evening at *{time_str}*.\n\n"
+        "When you're ready — and there's no rush — your "
+        "journey begins with:\n\n"
+        "/step1 · The Foundation of Honesty\n\n"
+        "This is the most important thing you'll do. "
+        "Take your time. I'll be here.",
         parse_mode="Markdown",
     )
